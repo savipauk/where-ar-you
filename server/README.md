@@ -23,3 +23,11 @@ The server does not simulate movement or do heavy computation — it just relays
 - Provide simple JSON responses.  
 - Remain lightweight and stateless.
 
+---
+
+## Instructions to run the Docker container
+
+```bash
+$ docker build -t relay-server .      
+$ docker run -p 3000:3000 relay-server
+```

@@ -1,41 +1,29 @@
-# ---- Builder stage ----
-FROM rust:1.90-slim-bullseye AS builder
+FROM rust:1.90-alpine3.20 AS builder
 
-# Set up working directory
-WORKDIR /usr/src/app
+RUN apk add --no-cache musl-dev openssl-dev pkgconfig sqlite-dev
 
-# Install dependencies for building static binaries
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    musl-tools build-essential && \
-    rm -rf /var/lib/apt/lists/*
+WORKDIR /app
 
-# Add MUSL target for static linking
-RUN rustup target add x86_64-unknown-linux-musl
-
-# Explicitly set the C compiler for the target architecture to fix cross-compilation
-ENV CC_x86_64_unknown_linux_musl=musl-gcc
-
-# Copy manifests first (for caching)
 COPY Cargo.toml Cargo.lock ./
-
-# Pre-build dependencies
-RUN mkdir src && echo "fn main() {}" > src/main.rs
-RUN cargo build --target x86_64-unknown-linux-musl --release
-
-# Copy the actual source code
 COPY src ./src
 
-# Build the final release binary
-RUN cargo build --target x86_64-unknown-linux-musl --release
+RUN cargo build --release
 
-# ---- Runtime stage ----
-FROM scratch
+FROM alpine:3.20
+RUN apk add --no-cache sqlite-libs ca-certificates
 
-# Copy statically linked binary
-COPY --from=builder /usr/src/app/target/x86_64-unknown-linux-musl/release/relay-server /relay-server
+RUN adduser -D appuser \
+    && mkdir -p /data \
+    && chown -R appuser:appuser /data
 
-# Expose port and set command
+WORKDIR /data
+
+COPY --from=builder /app/target/release/relay-server /usr/local/bin/relay-server
+RUN chown appuser:appuser /usr/local/bin/relay-server && chmod +x /usr/local/bin/relay-server
+
+USER appuser
+
 EXPOSE 3000
-CMD ["/relay-server"]
 
+CMD ["relay-server"]
 
