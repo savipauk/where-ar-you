@@ -24,9 +24,35 @@ export default function Index() {
     const loc = await Location.getCurrentPositionAsync({
       accuracy: Location.Accuracy.BestForNavigation
     });
+    console.log("Got location:", loc.coords);
 
     setLocation({ lat: loc.coords.latitude, lon: loc.coords.longitude, timestamp: loc.timestamp });
-    console.log("Got location:", loc.coords);
+
+    const server_url = process.env.EXPO_PUBLIC_RELAY_SERVER_URL || "";
+    console.log("SERVER_URL: " + server_url)
+
+    const body = {
+      username: "placeholder username",
+      latitude: loc.coords.latitude,
+      longitude: loc.coords.longitude,
+      timestamp: loc.timestamp
+    }
+
+    console.log(body)
+
+    const params = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    }
+
+    try {
+      const res = await fetch(server_url + "/location", params);
+      const data = await res.json();
+      console.log(data);
+    } catch (e) {
+      console.error(e)
+    }
   }
 
   return (
