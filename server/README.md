@@ -28,6 +28,6 @@ The server does not simulate movement or do heavy computation — it just relays
 ## Instructions to run the Docker container
 
 ```bash
-$ docker build -t relay-server .      
-$ docker run -p 3000:3000 relay-server
+$ docker build -t relay-server .
+$ docker run -p 3000:3000 --env-file .env relay-server
 ```

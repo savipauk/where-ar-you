@@ -7,11 +7,17 @@ use axum::{
     response::IntoResponse,
     routing::{get, post},
 };
+use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use sqlx::{SqlitePool, sqlite::SqlitePoolOptions};
 
-struct AppState {
+mod auth;
+use auth::AuthenticatedUser;
+
+pub struct AppState {
     db_pool: SqlitePool,
+    http_client: Client,
+    google_client_id: String,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, sqlx::FromRow)]
@@ -36,6 +42,8 @@ fn default_max_age() -> u64 {
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Starting up the server...");
 
+    let google_client_id = std::env::var("GOOGLE_CLIENT_ID").expect("GOOGLE_CLIENT_ID must be set");
+
     let db_filename = "locations.db";
 
     if !std::path::Path::new(db_filename).exists() {
@@ -46,21 +54,34 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .max_connections(1)
         .connect(&format!("sqlite://{}", db_filename))
         .await?;
+
     sqlx::query(
         r#"
+        create table if not exists users (
+            id text primary key,
+            email text not null unique,
+            name text,
+            last_seen integer
+        );
+
         create table if not exists locations (
             id integer primary key autoincrement,
-            username text not null,
+            user_id text not null,
             latitude real not null,
             longitude real not null,
-            timestamp integer not null
+            timestamp integer not null,
+            foreign key (user_id) references users(id)
         );
         "#,
     )
     .execute(&pool)
     .await?;
 
-    let app_state = Arc::new(AppState { db_pool: pool });
+    let app_state = Arc::new(AppState {
+        db_pool: pool,
+        http_client: Client::new(),
+        google_client_id,
+    });
 
     let app = Router::new()
         .route("/location", post(create_location))
@@ -77,9 +98,55 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 async fn create_location(
     State(state): State<Arc<AppState>>,
+    AuthenticatedUser(claims): AuthenticatedUser,
     Json(payload): Json<Location>,
 ) -> impl IntoResponse {
-    println!("Received new location: {:#?}", payload);
+    println!(
+        "Received new location: {:#?}, from user {}",
+        payload, claims.email
+    );
+
+    // Do a transaction because either both the user and location insert succeed, or both fail
+    let mut transaction = match state.db_pool.begin().await {
+        Ok(transaction) => transaction,
+        Err(e) => {
+            println!("Failed to begin database transaction: {}", e);
+            return (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Database error".to_string(),
+            );
+        }
+    };
+
+    let current_timestamp = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map(|d| d.as_secs() as i64)
+        .unwrap_or(0);
+
+    if let Err(e) = sqlx::query(
+        r#"
+        insert into users (id, email, name, last_seen)
+        values (?, ?, ?, ?)
+        on conflict(id) do update set 
+            email = excluded.email,
+            name = excluded.name,
+            last_seen = excluded.last_seen;
+        "#,
+    )
+    .bind(&claims.subject)
+    .bind(&claims.email)
+    .bind(&claims.name)
+    .bind(current_timestamp)
+    .execute(&mut *transaction)
+    .await
+    {
+        println!("Failed to update user: {}", e);
+        transaction.rollback().await.ok(); // Attempt to rollback
+        return (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "Failed to update user info".to_string(),
+        );
+    }
 
     let result = sqlx::query(
         r#"
@@ -91,22 +158,32 @@ async fn create_location(
     .bind(payload.longitude)
     .bind(payload.latitude)
     .bind(payload.timestamp)
-    .execute(&state.db_pool)
+    .execute(&mut *transaction)
     .await;
 
     match result {
         Ok(_) => {
-            println!("Successfully stored location");
+            if let Err(e) = transaction.commit().await {
+                println!("Failed to commit transaction: {}", e);
+                return (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    "Database error on commit".to_string(),
+                );
+            }
+            println!(
+                "Successfully stored new location for user {}",
+                &claims.email
+            );
             (
                 StatusCode::CREATED,
-                Json(serde_json::json!({"status": "Location created successfully"})),
+                "Location created successfully".to_string(),
             )
         }
         Err(e) => {
             println!("Failed to store location: {}", e);
             (
                 StatusCode::INTERNAL_SERVER_ERROR,
-                Json(serde_json::json!({"error": "Failed to store location"})),
+                "Failed to store location".to_string(),
             )
         }
     }
@@ -131,14 +208,14 @@ async fn get_locations(
 
     let result = sqlx::query_as::<_, Location>(
         r#"
-        select username, latitude, longitude, timestamp
-        from locations
-        where (username, timestamp) in (
-            select username, max(timestamp)
-            from locations
-            where timestamp >= ?
-            group by username
-        )
+        select 
+            coalesce(u.name, 'Anonymous') as name,
+            l.latitude,
+            l.longitude,
+            l.timestamp
+        from locations l
+        join users u on l.user_id = u.user_id
+        where l.timestamp >= ?
         order by timestamp desc;
         "#,
     )
