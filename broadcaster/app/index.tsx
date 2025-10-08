@@ -6,6 +6,7 @@ import { ThemedView } from "@/components/themed-view";
 import { HelloWave } from "@/components/hello-wave";
 import { useState } from "react";
 import * as Location from "expo-location";
+import GoogleLoginButton from "@/components/login";
 
 export default function Index() {
   const [location, setLocation] = useState<{
@@ -73,6 +74,10 @@ export default function Index() {
       <ThemedText style={{ marginTop: 20 }}>
         Location: {location ? `${location.lat}, ${location.lon}` : "Unknown"}
       </ThemedText>
+
+      <GoogleLoginButton onLogin={function(id: string): void {
+        throw new Error("Function not implemented.");
+      }} />
 
       <Button title="Update Location" onPress={updateLocation} />
 
