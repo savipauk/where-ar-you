@@ -214,7 +214,7 @@ async fn get_locations(
             l.longitude,
             l.timestamp
         from locations l
-        join users u on l.user_id = u.user_id
+        join users u on l.user_id = u.id
         where l.timestamp >= ?
         order by timestamp desc;
         "#,

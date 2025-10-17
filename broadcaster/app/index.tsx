@@ -6,6 +6,7 @@ import { ThemedView } from "@/components/themed-view";
 import { HelloWave } from "@/components/hello-wave";
 import { useState } from "react";
 import * as Location from "expo-location";
+import { setItemAsync, getItemAsync } from "expo-secure-store";
 import GoogleLoginButton from "@/components/login";
 
 export default function Index() {
@@ -16,6 +17,12 @@ export default function Index() {
   } | null>(null);
 
   const updateLocation = async () => {
+    const token = await getItemAsync('id_token');
+    if (!token) {
+      console.log("No OAuth token!");
+      return;
+    }
+
     const { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== "granted") {
       console.warn("Location permission denied!");
@@ -43,9 +50,12 @@ export default function Index() {
 
     const params = {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
       body: JSON.stringify(body)
-    }
+    };
 
     try {
       const res = await fetch(server_url + "/location", params);
@@ -75,8 +85,11 @@ export default function Index() {
         Location: {location ? `${location.lat}, ${location.lon}` : "Unknown"}
       </ThemedText>
 
-      <GoogleLoginButton onLogin={function(id: string): void {
-        throw new Error("Function not implemented.");
+      <GoogleLoginButton onLogin={async function(id_token: string): Promise<void> {
+        // OAuth redirects to a static web page which redirects to the app
+        // so this path is currently unused. Instead, check the oauth2redirect
+        // page.
+        throw new Error("Unimplemented");
       }} />
 
       <Button title="Update Location" onPress={updateLocation} />

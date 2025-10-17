@@ -39,6 +39,21 @@
             "backgroundColor": "#000000"
           }
         }
+      ],
+      "expo-secure-store",
+      [
+      "expo-build-properties",
+      {
+         "android": {
+           "gradleProperties": [
+             {
+               "type": "property",
+               "key": "org.gradle.java.home",
+               "value": "$JAVA_HOME" 
+             }
+           ],
+         }
+       }
       ]
     ],
     "experiments": {

@@ -6,7 +6,7 @@ import { Button } from 'react-native';
 WebBrowser.maybeCompleteAuthSession();
 
 type GoogleLoginButtonProps = {
-  onLogin: (id: string) => void;
+  onLogin: (id: string) => Promise<void>;
 }
 
 export default function GoogleLoginButton({ onLogin }: GoogleLoginButtonProps) {
