@@ -1,0 +1,4 @@
+# Omit the boilerplate React Native Expo code 
+broadcaster/components/** linguist-vendored
+\!broadcaster/components/login.tsx
+broadcaster/hooks/** linguist-vendored
