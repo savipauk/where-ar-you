@@ -84,6 +84,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     });
 
     let app = Router::new()
+        .route("/hello", get(hello))
         .route("/location", post(create_location))
         .route("/locations", get(get_locations))
         .with_state(app_state);
@@ -94,6 +95,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     axum::serve(listener, app).await?;
 
     Ok(())
+}
+
+async fn hello() -> impl IntoResponse {
+    StatusCode::OK
 }
 
 async fn create_location(
