@@ -11,4 +11,4 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c8bc60fe6e655c444ab9e7db1b87f0e2, type: 3}
   m_Name: XREALXRLoader
-  m_EditorClassIdentifier: Unity.XR.XREAL::Unity.XR.XREAL.XREALXRLoader
+  m_EditorClassIdentifier: 
