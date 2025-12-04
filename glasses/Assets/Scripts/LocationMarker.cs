@@ -14,6 +14,8 @@ public class LocationMarker : MonoBehaviour
     public GameObject SpherePrefab = null;
     public GameObject CubePrefab = null;
 
+    public GameObject DistanceIndicatorPrefab = null;
+
     public void UpdateMarkerStyle(string markerType, bool displayDistanceIndicator, bool scaleWithDistance)
     {
         RemoveCurrentMarkerStyle();
@@ -37,10 +39,24 @@ public class LocationMarker : MonoBehaviour
         if (markerType == "2d_waypoint" || markerType == "2d_circle" || markerType == "2d_square")
         {
             // Create a billboard object and set the matching material
-            // according to the markerType
+            // according to the markerType, as well as other options
+            // (should the billboard scale with distance?)
 
             var billboard = Instantiate(billboardPrefab, transform.position + new Vector3(0, markerOffset, 0), Quaternion.identity);
             billboard.transform.SetParent(transform);
+
+            if (displayDistanceIndicator)
+            {
+                var distanceIndicator = Instantiate(DistanceIndicatorPrefab, Vector3.zero, Quaternion.identity);
+
+                distanceIndicator.AddComponent<Billboard>();
+                distanceIndicator.GetComponent<Billboard>().RotationOffset = Vector3.zero;
+                distanceIndicator.GetComponent<Billboard>().AllowScaleWithDistance = true;
+                distanceIndicator.GetComponent<Billboard>().StaticScaleFactor = 0.5f;
+                
+                distanceIndicator.transform.SetParent(billboard.transform);
+                distanceIndicator.transform.localPosition = new Vector3(0, 0, -6.0f);
+            }
 
             billboard.GetComponent<Renderer>().material = markerType switch
             {
@@ -49,10 +65,12 @@ public class LocationMarker : MonoBehaviour
                 "2d_square" => SquareMat,
                 _ => null,
             };
+
+            billboard.gameObject.GetComponent<Billboard>().AllowScaleWithDistance = scaleWithDistance;
         }
         else
         {
-            // Simply instantiate a matching 3d prefab according to the markerType
+            // We're not using a billboard, so just instantiate a matching 3d prefab according to the markerType
 
             var prefab = markerType switch
             {
@@ -63,6 +81,16 @@ public class LocationMarker : MonoBehaviour
             };
 
             var obj = Instantiate(prefab, transform.position + new Vector3(0, markerOffset, 0), Quaternion.identity);
+
+            if (displayDistanceIndicator)
+            {
+                var distanceIndicator = Instantiate(DistanceIndicatorPrefab, transform.position + new Vector3(0, markerOffset + 1.0f, 0), Quaternion.identity);
+                distanceIndicator.AddComponent<Billboard>();
+                distanceIndicator.GetComponent<Billboard>().RotationOffset = Vector3.zero;
+                distanceIndicator.GetComponent<Billboard>().StaticScaleFactor = 0.01f;
+                distanceIndicator.transform.SetParent(obj.transform);
+            }
+
             obj.transform.SetParent(transform);
         }
     }

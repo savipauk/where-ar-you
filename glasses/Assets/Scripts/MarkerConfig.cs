@@ -59,4 +59,15 @@ public class MarkerConfig : MonoBehaviour
         markerType = "3d_arrow";
         RefreshMarkers();
     }
+    public void OnToggleDistanceIndicator()
+    {
+        displayDistanceIndicator = !displayDistanceIndicator;
+        RefreshMarkers();
+    }
+
+    public void OnToggleScaleWithDistance()
+    {
+        scaleWithDistance = !scaleWithDistance;
+        RefreshMarkers();
+    }
 }
