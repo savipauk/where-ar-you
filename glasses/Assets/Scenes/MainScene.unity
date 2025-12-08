@@ -1697,7 +1697,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 878fe99f81962df41a37bd2b03626296, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PositionServerAddress: http://localhost:5000
+  PositionServerAddress: http://161.53.19.24:3000/locations
   PositionServerFetchInterval: 0.5
   DesiredLocalAccuracyInMeters: 1
   UpdateLocalDistanceInMeters: 1

@@ -4,14 +4,14 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.Networking;
+using Newtonsoft.Json;
 
 public class GeoPosition
 {
-    public string Username { get; set; }
-    public float Latitude { get; set; }
-    public float Longitude { get; set; }
-    public float Altitude { get; set; }
-    public Time Timestamp { get; set; }
+    public string username { get; set; }
+    public float latitude { get; set; }
+    public float longitude { get; set; }
+    public int timestamp { get; set; }
 }
 
 public class PositionServiceClient : MonoBehaviour
@@ -27,7 +27,7 @@ public class PositionServiceClient : MonoBehaviour
 
     IEnumerator FetchPositions()
     {
-        UnityWebRequest request = UnityWebRequest.Get($"{PositionServerAddress}/positions");
+        UnityWebRequest request = UnityWebRequest.Get(PositionServerAddress);
         yield return request.SendWebRequest();
 
         if (request.result != UnityWebRequest.Result.Success)
@@ -38,14 +38,14 @@ public class PositionServiceClient : MonoBehaviour
         {
             string jsonResponse = request.downloadHandler.text;
 
-            List<GeoPosition> positions = JsonUtility.FromJson<List<GeoPosition>>(jsonResponse);
+            List<GeoPosition> deserialized = JsonConvert.DeserializeObject<List<GeoPosition>>(jsonResponse);
 
-            if (origin == null || positions.Count == 0)
+            if (origin == null || deserialized.Count == 0)
             {
                 yield break;
             }
 
-            GetComponent<MarkerPoolController>().SetMarkers(positions, origin);
+            GetComponent<MarkerPoolController>().SetMarkers(deserialized, origin);
         }
     }
 
@@ -71,9 +71,9 @@ public class PositionServiceClient : MonoBehaviour
             LocationInfo locInfo = Input.location.lastData;
             origin = new GeoPosition
             {
-                Latitude = locInfo.latitude,
-                Longitude = locInfo.longitude,
-                Altitude = locInfo.altitude
+                latitude = locInfo.latitude,
+                longitude = locInfo.longitude,
+               //altitude = locInfo.altitude
             };
         }
     }
