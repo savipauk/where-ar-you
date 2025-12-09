@@ -20,4 +20,5 @@ glasses/Packages/** linguist-vendored
 glasses/Assets/** linguist-vendored
 
 # Re-include the custom code
+\!glasses/Assets/Scripts/
 \!glasses/Assets/Scripts/**
