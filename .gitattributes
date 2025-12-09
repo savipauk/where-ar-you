@@ -2,9 +2,6 @@
 broadcaster/components/** linguist-vendored
 broadcaster/hooks/** linguist-vendored
 
-# Re-include the custom login component
-!broadcaster/components/login.tsx
-
 # Ignore Unity auto-generated folders
 glasses/Library/** linguist-vendored
 glasses/Temp/** linguist-vendored
@@ -15,10 +12,7 @@ glasses/UserSettings/** linguist-vendored
 
 # Ignore Unity package / vendor code
 glasses/Packages/** linguist-vendored
-
-# Ignore Unity Assets by default
-glasses/Assets/** linguist-vendored
-
-# Re-include the custom code
-!glasses/Assets/Scripts/
-!glasses/Assets/Scripts/**
+glasses/Assets/Plugins/** linguist-vendored
+glasses/Assets/XRI/** linguist-vendored
+glasses/Assets/XR/** linguist-vendored
+glasses/Assets/TextMesh\ Pro/** linguist-vendored
