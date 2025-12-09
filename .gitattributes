@@ -3,7 +3,7 @@ broadcaster/components/** linguist-vendored
 broadcaster/hooks/** linguist-vendored
 
 # Re-include the custom login component
-\!broadcaster/components/login.tsx
+!broadcaster/components/login.tsx
 
 # Ignore Unity auto-generated folders
 glasses/Library/** linguist-vendored
@@ -20,5 +20,5 @@ glasses/Packages/** linguist-vendored
 glasses/Assets/** linguist-vendored
 
 # Re-include the custom code
-\!glasses/Assets/Scripts/
-\!glasses/Assets/Scripts/**
+!glasses/Assets/Scripts/
+!glasses/Assets/Scripts/**
