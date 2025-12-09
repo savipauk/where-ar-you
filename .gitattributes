@@ -15,5 +15,5 @@ glasses/Packages/** linguist-vendored
 glasses/Assets/Plugins/** linguist-vendored
 glasses/Assets/XRI/** linguist-vendored
 glasses/Assets/XR/** linguist-vendored
-glasses/Assets/Samples/** linguist-vendored
-"glasses/Assets/TextMesh\ Pro/**" linguist-vendored
+"glasses/Assets/Samples/**" linguist-vendored
+"glasses/Assets/TextMesh Pro/**" linguist-vendored
