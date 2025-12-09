@@ -25,6 +25,7 @@ struct Location {
     username: String,
     latitude: f64,
     longitude: f64,
+    altitude: f64,
     timestamp: i64,
 }
 
@@ -69,6 +70,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             user_id text not null,
             latitude real not null,
             longitude real not null,
+            altitude real not null,
             timestamp integer not null,
             foreign key (user_id) references users(id)
         );
@@ -155,12 +157,13 @@ async fn create_location(
 
     let result = sqlx::query(
         r#"
-        insert into locations (username, latitude, longitude, timestamp)
-        values (?, ?, ?, ?)
+        insert into locations (username, latitude, longitude, altitude, timestamp)
+        values (?, ?, ?, ?, ?)
         "#,
     )
     .bind(payload.username)
     .bind(payload.longitude)
+    .bind(payload.altitude)
     .bind(payload.latitude)
     .bind(payload.timestamp)
     .execute(&mut *transaction)
@@ -217,6 +220,7 @@ async fn get_locations(
             coalesce(u.name, 'Anonymous') as name,
             l.latitude,
             l.longitude,
+            l.altitude,
             l.timestamp
         from locations l
         join users u on l.user_id = u.id

@@ -1,4 +1,4 @@
-import ParallaxScrollView from "@/app-example/components/parallax-scroll-view";
+import ParallaxScrollView from "@/components/parallax-scroll-view";
 import { ThemedText } from "@/components/themed-text";
 import { Button, StyleSheet } from 'react-native';
 import { Image } from 'expo-image';
@@ -7,12 +7,13 @@ import { HelloWave } from "@/components/hello-wave";
 import { useState } from "react";
 import * as Location from "expo-location";
 import { setItemAsync, getItemAsync } from "expo-secure-store";
-import GoogleLoginButton from "@/components/login";
+import GoogleLoginButton from "@/custom-components/login";
 
 export default function Index() {
   const [location, setLocation] = useState<{
     lat: number;
     lon: number;
+    altitude: number;
     timestamp: number,
   } | null>(null);
 
@@ -34,7 +35,12 @@ export default function Index() {
     });
     console.log("Got location:", loc.coords);
 
-    setLocation({ lat: loc.coords.latitude, lon: loc.coords.longitude, timestamp: loc.timestamp });
+    setLocation({
+      lat: loc.coords.latitude,
+      lon: loc.coords.longitude,
+      altitude: loc.coords.altitudeAccuracy || -1,
+      timestamp: loc.timestamp
+    });
 
     const server_url = process.env.EXPO_PUBLIC_RELAY_SERVER_URL || "";
     console.log("SERVER_URL: " + server_url)
