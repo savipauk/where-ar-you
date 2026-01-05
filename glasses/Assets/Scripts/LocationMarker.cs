@@ -1,8 +1,11 @@
 using System.Runtime.CompilerServices;
+using Unity.XR.CoreUtils;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class LocationMarker : MonoBehaviour
 {
+    private const float billboardIndicatorStaticScale = 0.5f;
     public float markerOffset = 4.25f;
 
     public GameObject billboardPrefab = null;
@@ -45,20 +48,14 @@ public class LocationMarker : MonoBehaviour
             var billboard = Instantiate(billboardPrefab, transform.position + new Vector3(0, markerOffset, 0), Quaternion.identity);
             billboard.transform.SetParent(transform);
 
-            if (displayDistanceIndicator)
+            if (!displayDistanceIndicator)
             {
-                var distanceIndicator = Instantiate(DistanceIndicatorPrefab, Vector3.zero, Quaternion.identity);
-
-                distanceIndicator.AddComponent<Billboard>();
-                distanceIndicator.GetComponent<Billboard>().RotationOffset = Vector3.zero;
-                distanceIndicator.GetComponent<Billboard>().AllowScaleWithDistance = true;
-                distanceIndicator.GetComponent<Billboard>().StaticScaleFactor = 0.5f;
-                
-                distanceIndicator.transform.SetParent(billboard.transform);
-                distanceIndicator.transform.localPosition = new Vector3(0, 0, -6.0f);
+                // Remove the indicator if it's turned off
+                Destroy(billboard.GetNamedChild("DistanceIndicator"));
             }
 
-            billboard.GetComponent<Renderer>().material = markerType switch
+            var ui_image = billboard.GetComponentInChildren<Image>();
+            ui_image.material = markerType switch
             {
                 "2d_waypoint" => WaypointMat,
                 "2d_circle" => CircleMat,
@@ -66,7 +63,7 @@ public class LocationMarker : MonoBehaviour
                 _ => null,
             };
 
-            billboard.gameObject.GetComponent<Billboard>().AllowScaleWithDistance = scaleWithDistance;
+            billboard.gameObject.GetComponentInChildren<Billboard>().AllowScaleWithDistance = scaleWithDistance;
         }
         else
         {
@@ -80,14 +77,12 @@ public class LocationMarker : MonoBehaviour
                 _ => null,
             };
 
-            var obj = Instantiate(prefab, transform.position + new Vector3(0, markerOffset, 0), Quaternion.identity);
+            var obj = Instantiate(prefab, transform.position + new Vector3(0, markerOffset, 0), Quaternion.Euler(-90, 0, 0));
 
             if (displayDistanceIndicator)
             {
-                var distanceIndicator = Instantiate(DistanceIndicatorPrefab, transform.position + new Vector3(0, markerOffset + 1.0f, 0), Quaternion.identity);
-                distanceIndicator.AddComponent<Billboard>();
-                distanceIndicator.GetComponent<Billboard>().RotationOffset = Vector3.zero;
-                distanceIndicator.GetComponent<Billboard>().StaticScaleFactor = 0.01f;
+                var distanceIndicator = Instantiate(DistanceIndicatorPrefab, transform.position + new Vector3(0, markerOffset + 0.25f, 0), Quaternion.identity);
+
                 distanceIndicator.transform.SetParent(obj.transform);
             }
 
