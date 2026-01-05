@@ -72,11 +72,64 @@ Join our community of developers creating universal apps.
 - [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
 
 
-## Notes
+## Building and Installing on Device
 
-Build locally with
-```
-ANDROID_HOME=$HOME/Library/Android/sdk eas build --platform android --local --profile development
+### Development Build (Dev Client)
+
+A development build lets you run the app on a real device while loading JavaScript from your local Metro server.
+
+Build the dev client:
+
+```bash
+ANDROID_HOME=$HOME/Library/Android/sdk \
+eas build --platform android --local --profile development --output ./build/broadcaster-dev.apk
 ```
 
-Prerequisties are openjdk version 17 and the Android SDK.
+**Prerequisites:**
+
+* OpenJDK 17
+* Android SDK installed
+* USB debugging enabled on your phone
+
+Install the APK on your device:
+
+```bash
+adb install -r ./build/broadcaster-dev.apk
+```
+
+Start Metro:
+
+```bash
+npx expo start --dev-client
+```
+
+Open the **broadcaster** app on your phone. It will connect to the running development server (ensure your phone and laptop are on the same Wi-Fi).
+
+---
+
+### Standalone APK Build (Offline)
+
+A standalone build bundles your JavaScript inside the APK and does **not** require Metro.
+
+Build the standalone APK as a preview:
+
+```bash
+ANDROID_HOME=$HOME/Library/Android/sdk \
+eas build --platform android --local --profile preview --output ./build/broadcaster.apk
+```
+
+or a production build:
+
+```bash
+ANDROID_HOME=$HOME/Library/Android/sdk \
+eas build --platform android --local --profile production --output ./build/broadcaster.apk
+```
+
+Install it on your device:
+
+```bash
+adb install -r ./build/broadcaster.apk
+```
+
+This version runs independently on the device without needing a development server.
+

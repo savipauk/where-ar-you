@@ -1,4 +1,19 @@
-# Omit the boilerplate React Native Expo code 
+# Ignore the boilerplate React Native Expo code 
 broadcaster/components/** linguist-vendored
-\!broadcaster/components/login.tsx
 broadcaster/hooks/** linguist-vendored
+
+# Ignore Unity auto-generated folders
+glasses/Library/** linguist-vendored
+glasses/Temp/** linguist-vendored
+glasses/Obj/** linguist-vendored
+glasses/Logs/** linguist-vendored
+glasses/ProjectSettings/** linguist-vendored
+glasses/UserSettings/** linguist-vendored
+
+# Ignore Unity package / vendor code
+glasses/Packages/** linguist-vendored
+glasses/Assets/Plugins/** linguist-vendored
+glasses/Assets/XRI/** linguist-vendored
+glasses/Assets/XR/** linguist-vendored
+"glasses/Assets/Samples/**" linguist-vendored
+"glasses/Assets/TextMesh Pro/**" linguist-vendored
