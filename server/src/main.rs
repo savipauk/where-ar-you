@@ -67,7 +67,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         create table if not exists locations (
             id integer primary key autoincrement,
-            user_id text not null,
+            username text not null,
             latitude real not null,
             longitude real not null,
             altitude real not null,
