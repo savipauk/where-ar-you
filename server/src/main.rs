@@ -60,7 +60,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         r#"
         create table if not exists users (
             id text primary key,
-            email text not null unique,
+            username text not null unique,
             name text,
             last_seen integer
         );
@@ -132,10 +132,10 @@ async fn create_location(
 
     if let Err(e) = sqlx::query(
         r#"
-        insert into users (id, email, name, last_seen)
+        insert into users (id, username, name, last_seen)
         values (?, ?, ?, ?)
         on conflict(id) do update set 
-            email = excluded.email,
+            username = excluded.username,
             name = excluded.name,
             last_seen = excluded.last_seen;
         "#,
