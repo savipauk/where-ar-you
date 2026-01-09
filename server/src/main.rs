@@ -113,7 +113,6 @@ async fn create_location(
         payload, claims.email
     );
 
-    // Do a transaction because either both the user and location insert succeed, or both fail
     let mut transaction = match state.db_pool.begin().await {
         Ok(transaction) => transaction,
         Err(e) => {
@@ -148,53 +147,52 @@ async fn create_location(
     .await
     {
         println!("Failed to update user: {}", e);
-        transaction.rollback().await.ok(); // Attempt to rollback
+        transaction.rollback().await.ok();
         return (
             StatusCode::INTERNAL_SERVER_ERROR,
             "Failed to update user info".to_string(),
         );
     }
 
-    let result = sqlx::query(
+    if let Err(e) = sqlx::query(
         r#"
-        insert into locations (username, latitude, longitude, altitude, timestamp)
+        insert into locations (user_id, latitude, longitude, altitude, timestamp)
         values (?, ?, ?, ?, ?)
         "#,
     )
     .bind(&claims.subject)
+    .bind(payload.latitude)
     .bind(payload.longitude)
     .bind(payload.altitude)
-    .bind(payload.latitude)
     .bind(payload.timestamp)
     .execute(&mut *transaction)
-    .await;
-
-    match result {
-        Ok(_) => {
-            if let Err(e) = transaction.commit().await {
-                println!("Failed to commit transaction: {}", e);
-                return (
-                    StatusCode::INTERNAL_SERVER_ERROR,
-                    "Database error on commit".to_string(),
-                );
-            }
-            println!(
-                "Successfully stored new location for user {}",
-                &claims.email
-            );
-            (
-                StatusCode::CREATED,
-                "Location created successfully".to_string(),
-            )
-        }
-        Err(e) => {
-            println!("Failed to store location: {}", e);
-            (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                "Failed to store location".to_string(),
-            )
-        }
+    .await
+    {
+        println!("Failed to store location: {}", e);
+        transaction.rollback().await.ok();
+        return (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "Failed to store location".to_string(),
+        );
     }
+
+    if let Err(e) = transaction.commit().await {
+        println!("Failed to commit transaction: {}", e);
+        return (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "Database error on commit".to_string(),
+        );
+    }
+
+    println!(
+        "Successfully stored new location for user {}",
+        &claims.email
+    );
+
+    (
+        StatusCode::CREATED,
+        "Location created successfully".to_string(),
+    )
 }
 
 async fn get_locations(
@@ -217,7 +215,7 @@ async fn get_locations(
     let result = sqlx::query_as::<_, Location>(
         r#"
         select 
-            coalesce(u.name, 'Anonymous') as name,
+            coalesce(u.name, u.username) as username,
             l.latitude,
             l.longitude,
             l.altitude,
@@ -225,7 +223,7 @@ async fn get_locations(
         from locations l
         join users u on l.user_id = u.id
         where l.timestamp >= ?
-        order by timestamp desc;
+        order by l.timestamp desc;
         "#,
     )
     .bind(min_timestamp)
@@ -238,7 +236,7 @@ async fn get_locations(
             (StatusCode::OK, Json(serde_json::json!(locations)))
         }
         Err(e) => {
-            println!("Failed to fetch location: {}", e);
+            println!("Failed to fetch locations: {}", e);
             (
                 StatusCode::INTERNAL_SERVER_ERROR,
                 Json(serde_json::json!({"error": "Failed to fetch locations"})),
