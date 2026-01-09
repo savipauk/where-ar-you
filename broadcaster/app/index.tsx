@@ -19,6 +19,7 @@ export default function Index() {
 
   const updateLocation = async () => {
     const token = await getItemAsync('id_token');
+    const user = await getItemAsync('user');
 
     if (!token) {
       Alert.alert("Authentication Required", "Please sign in with Google first.");
@@ -41,17 +42,28 @@ export default function Index() {
     setLocation({
       lat: loc.coords.latitude,
       lon: loc.coords.longitude,
-      altitude: loc.coords.altitudeAccuracy || -1,
+      altitude: loc.coords.altitudeAccuracy || 0,
       timestamp: loc.timestamp
     });
 
     const server_url = process.env.EXPO_PUBLIC_RELAY_SERVER_URL || "";
     console.log("SERVER_URL: " + server_url)
 
+    let userEmail = "unknown";
+    if (user) {
+      try {
+        const userData = JSON.parse(user);
+        userEmail = userData.email || "unknown";
+      } catch (e) {
+        console.error("Failed to parse user_info", e);
+      }
+    }
+
     const body = {
-      username: "placeholder username",
+      username: userEmail,
       latitude: loc.coords.latitude,
       longitude: loc.coords.longitude,
+      altitude: loc.coords.altitudeAccuracy || 0,
       timestamp: loc.timestamp
     }
 
@@ -101,7 +113,7 @@ export default function Index() {
       </ThemedView>
 
       <ThemedText style={{ marginTop: 20 }}>
-        Location: {location ? `${location.lat}, ${location.lon}` : "Unknown"}
+        Location: {location ? `${location.lat}, ${location.lon}, ${location.altitude}` : "Unknown"}
       </ThemedText>
 
       <Login onLogin={() => Alert.alert("Logged In", "Token saved securely.")} />
