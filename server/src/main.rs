@@ -161,7 +161,7 @@ async fn create_location(
         values (?, ?, ?, ?, ?)
         "#,
     )
-    .bind(payload.username)
+    .bind(&claims.subject)
     .bind(payload.longitude)
     .bind(payload.altitude)
     .bind(payload.latitude)
