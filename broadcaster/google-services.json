@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "",
-    "project_id": "",
-    "storage_bucket": ""
+    "project_number": "695657926362",
+    "project_id": "where-ar-you-6536f",
+    "storage_bucket": "where-ar-you-6536f.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "",
+        "mobilesdk_app_id": "1:695657926362:android:3ab075b0d184baf3259fe3",
         "android_client_info": {
           "package_name": "com.savipauk.broadcaster"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": ""
+          "current_key": "AIzaSyDsO_W5Y9nhQjwLDK91cBs6Swa5Xv_vpt4"
         }
       ],
       "services": {
