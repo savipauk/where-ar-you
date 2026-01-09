@@ -3,6 +3,9 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { View, ActivityIndicator } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 
+
+// DEPRECATED
+
 export default function OAuth2Redirect() {
   const { code } = useLocalSearchParams<{ code?: string }>();
   const router = useRouter();
@@ -26,14 +29,11 @@ export default function OAuth2Redirect() {
       });
 
       const data = await tokenResponse.json();
-      console.log(data);
+      console.log('TOKENS:', data);
+      router.replace('/');
     }
 
-    console.log('OAuth code:', code);
-
-
-
-    // router.replace('/');
+    fetchTokens()
   }, [code, router]);
 
   return (

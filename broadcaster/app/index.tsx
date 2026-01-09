@@ -1,13 +1,13 @@
 import ParallaxScrollView from "@/components/parallax-scroll-view";
 import { ThemedText } from "@/components/themed-text";
-import { Button, StyleSheet } from 'react-native';
+import { Alert, Button, StyleSheet } from 'react-native';
 import { Image } from 'expo-image';
 import { ThemedView } from "@/components/themed-view";
 import { HelloWave } from "@/components/hello-wave";
 import { useState } from "react";
 import * as Location from "expo-location";
-import { setItemAsync, getItemAsync } from "expo-secure-store";
-import GoogleLoginButton from "@/custom-components/login";
+import { getItemAsync } from "expo-secure-store";
+import Login from "@/custom-components/login";
 
 export default function Index() {
   const [location, setLocation] = useState<{
@@ -19,13 +19,16 @@ export default function Index() {
 
   const updateLocation = async () => {
     const token = await getItemAsync('id_token');
+
     if (!token) {
+      Alert.alert("Authentication Required", "Please sign in with Google first.");
       console.log("No OAuth token!");
       return;
     }
 
     const { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== "granted") {
+      Alert.alert("Permission Denied", "Allow location access to sync data.");
       console.warn("Location permission denied!");
       return;
     }
@@ -62,13 +65,23 @@ export default function Index() {
       },
       body: JSON.stringify(body)
     };
+    Alert.alert("server url", server_url);
 
     try {
       const res = await fetch(server_url + "/location", params);
-      const data = await res.json();
-      console.log(data);
+
+      if (res.ok) {
+        const data = await res.json();
+        console.log(data);
+        Alert.alert("Success", "Location synced to backend!");
+      } else {
+        const text = await res.text();
+        console.error("Server Error:", res.status, text);
+        Alert.alert("Server Error", `Status: ${res.status}`);
+      }
     } catch (e) {
       console.error(e)
+      Alert.alert("Network Error", "Could not reach the server.");
     }
   }
 
@@ -77,7 +90,7 @@ export default function Index() {
       headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
       headerImage={
         <Image
-          source={require('@/assets/images/partial-react-logo.png')}
+          source={require('../assets/images/partial-react-logo.png')}
           style={styles.reactLogo}
         />
       }>
@@ -91,12 +104,7 @@ export default function Index() {
         Location: {location ? `${location.lat}, ${location.lon}` : "Unknown"}
       </ThemedText>
 
-      <GoogleLoginButton onLogin={async function(id_token: string): Promise<void> {
-        // OAuth redirects to a static web page which redirects to the app
-        // so this path is currently unused. Instead, check the oauth2redirect
-        // page.
-        throw new Error("Unimplemented");
-      }} />
+      <Login onLogin={() => Alert.alert("Logged In", "Token saved securely.")} />
 
       <Button title="Update Location" onPress={updateLocation} />
 
