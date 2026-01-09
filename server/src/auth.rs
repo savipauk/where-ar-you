@@ -12,11 +12,15 @@ use crate::AppState;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub(crate) struct GoogleClaims {
+    #[serde(rename = "sub")]
     pub subject: String,
     pub email: String,
     pub name: String,
+    #[serde(rename = "aud")]
     pub audience: String,
+    #[serde(rename = "iss")]
     pub issuer: String,
+    #[serde(rename = "exp")]
     pub expiry: usize,
 }
 
