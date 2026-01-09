@@ -60,7 +60,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         r#"
         create table if not exists users (
             id text primary key,
-            email text not null unique,
+            username text not null unique,
             name text,
             last_seen integer
         );
