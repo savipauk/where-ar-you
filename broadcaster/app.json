@@ -22,7 +22,15 @@
         {
           "iosUrlScheme": "com.googleusercontent.apps.DUMMY"
         }
-      ]
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
+        }
+      ],
     ],
     "extra": {
       "router": {},

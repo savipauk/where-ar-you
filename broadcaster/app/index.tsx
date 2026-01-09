@@ -77,7 +77,6 @@ export default function Index() {
       },
       body: JSON.stringify(body)
     };
-    Alert.alert("server url", server_url);
 
     try {
       const res = await fetch(server_url + "/location", params);

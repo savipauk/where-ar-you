@@ -119,7 +119,7 @@ async fn create_location(
             println!("Failed to begin database transaction: {}", e);
             return (
                 StatusCode::INTERNAL_SERVER_ERROR,
-                "Database error".to_string(),
+                Json(serde_json::json!({ "status": "error", "message": "Database error" }))
             );
         }
     };
@@ -150,7 +150,7 @@ async fn create_location(
         transaction.rollback().await.ok();
         return (
             StatusCode::INTERNAL_SERVER_ERROR,
-            "Failed to update user info".to_string(),
+            Json(serde_json::json!({ "status": "error", "message": "Failed to update user info" }))
         );
     }
 
@@ -172,7 +172,7 @@ async fn create_location(
         transaction.rollback().await.ok();
         return (
             StatusCode::INTERNAL_SERVER_ERROR,
-            "Failed to store location".to_string(),
+            Json(serde_json::json!({ "status": "error", "message": "Failed to store location" }))
         );
     }
 
@@ -180,7 +180,7 @@ async fn create_location(
         println!("Failed to commit transaction: {}", e);
         return (
             StatusCode::INTERNAL_SERVER_ERROR,
-            "Database error on commit".to_string(),
+            Json(serde_json::json!({ "status": "error", "message": "Database error on commit" }))
         );
     }
 
@@ -191,7 +191,7 @@ async fn create_location(
 
     (
         StatusCode::CREATED,
-        "Location created successfully".to_string(),
+        Json(serde_json::json!({ "status": "success", "message": "Location created successfully" }))
     )
 }
 
