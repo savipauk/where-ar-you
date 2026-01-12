@@ -9,9 +9,10 @@ using Newtonsoft.Json;
 public class GeoPosition
 {
     public string username { get; set; }
-    public float latitude { get; set; }
-    public float longitude { get; set; }
-    public int timestamp { get; set; }
+    public double latitude { get; set; }
+    public double longitude { get; set; }
+    public double altitude { get; set; }
+    public double timestamp { get; set; }
 }
 
 public class PositionServiceClient : MonoBehaviour
@@ -19,11 +20,15 @@ public class PositionServiceClient : MonoBehaviour
     public string PositionServerAddress = "http://localhost:5000";
     public float PositionServerFetchInterval = 0.5f;
 
+    public GameObject MarkerPoolControllerObject;
+
     public float DesiredLocalAccuracyInMeters = 1f;
     public float UpdateLocalDistanceInMeters = 1f;
 
-    private GeoPosition origin = null;
+    private GeoPosition origin = new GeoPosition { latitude = 45.79252608797538, longitude = 15.909322357054675, altitude = 0.5 };
     private float fetchTimer = 0f;
+
+    private bool waitingForGeolocation = true;
 
     IEnumerator FetchPositions()
     {
@@ -37,15 +42,26 @@ public class PositionServiceClient : MonoBehaviour
         else
         {
             string jsonResponse = request.downloadHandler.text;
-
             List<GeoPosition> deserialized = JsonConvert.DeserializeObject<List<GeoPosition>>(jsonResponse);
+            
+            // Keep only the position with the latest (largest) timestamp for each user
+            List<GeoPosition> latest = new List<GeoPosition>();
+            Dictionary<string, GeoPosition> userPositions = new Dictionary<string, GeoPosition>();
+            foreach (GeoPosition pos in deserialized)
+            {
+                if (!userPositions.ContainsKey(pos.username) || pos.timestamp > userPositions[pos.username].timestamp)
+                {
+                    userPositions[pos.username] = pos;
+                }
+            }
+            latest.AddRange(userPositions.Values);
 
-            if (origin == null || deserialized.Count == 0)
+            if (waitingForGeolocation || deserialized.Count == 0)
             {
                 yield break;
             }
 
-            GetComponent<MarkerPoolController>().SetMarkers(deserialized, origin);
+            MarkerPoolControllerObject.GetComponent<MarkerPoolController>().SetMarkers(latest, origin);
         }
     }
 
@@ -65,15 +81,20 @@ public class PositionServiceClient : MonoBehaviour
             fetchTimer = PositionServerFetchInterval;
         }
 
+        // DEBUG ONLY
+        waitingForGeolocation = false;
+
         // Get the origin (user position) only initially - rely on device tracking afterwards
-        if (origin == null && Input.location.status == LocationServiceStatus.Running)
+        if (waitingForGeolocation && Input.location.status == LocationServiceStatus.Running)
         {
+            waitingForGeolocation = false;
+
             LocationInfo locInfo = Input.location.lastData;
             origin = new GeoPosition
             {
                 latitude = locInfo.latitude,
                 longitude = locInfo.longitude,
-               //altitude = locInfo.altitude
+                altitude = locInfo.altitude
             };
         }
     }

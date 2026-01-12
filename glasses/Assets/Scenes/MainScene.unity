@@ -1653,6 +1653,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   markerPrefab: {fileID: 8265191359797000129, guid: 045adca103db613408781be986134db7, type: 3}
+  markerConfig: {fileID: 423716192}
 --- !u!4 &674365299
 Transform:
   m_ObjectHideFlags: 0
@@ -1699,6 +1700,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PositionServerAddress: http://161.53.19.24:3000/locations
   PositionServerFetchInterval: 0.5
+  MarkerPoolControllerObject: {fileID: 674365297}
   DesiredLocalAccuracyInMeters: 1
   UpdateLocalDistanceInMeters: 1
 --- !u!4 &684309079

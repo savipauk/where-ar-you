@@ -6,6 +6,7 @@ using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 public class MarkerPoolController : MonoBehaviour
 {
     public GameObject markerPrefab;
+    public GameObject markerConfig;
 
     public void ClearMarkers()
     {
@@ -25,7 +26,7 @@ public class MarkerPoolController : MonoBehaviour
 
         // Assume origin is on (0, 0, 0) -> convert geoPos to local Unity coordinates
         double dx = geoPos.longitude - origin.longitude;
-        double dy = 0;//geoPos.altitude - origin.altitude;
+        double dy = geoPos.altitude - origin.altitude;
         double dz = geoPos.latitude - origin.latitude;
 
         return new Vector3(
@@ -42,5 +43,6 @@ public class MarkerPoolController : MonoBehaviour
         {
             Instantiate(markerPrefab, GetUnityPosFromGeoPosition(pos, origin), Quaternion.identity);
         }
+        markerConfig.GetComponent<MarkerConfig>().RefreshMarkerDecoration();
     }
 }

@@ -15,7 +15,7 @@ public class MarkerConfig : MonoBehaviour
         On2DWaypointClicked(); // Start with 2D Waypoint selected
     }
 
-    void RefreshMarkers()
+    public void RefreshMarkerDecoration()
     {
         var existingMarkers = GameObject.FindGameObjectsWithTag("Marker");
         foreach (var marker in existingMarkers)
@@ -27,47 +27,47 @@ public class MarkerConfig : MonoBehaviour
     public void On2DCircleClicked()
     {
         markerType = "2d_circle";
-        RefreshMarkers();
+        RefreshMarkerDecoration();
     }
 
     public void On2DSquareClicked()
     {
         markerType = "2d_square";
-        RefreshMarkers();
+        RefreshMarkerDecoration();
     }
 
     public void On2DWaypointClicked()
     {
         markerType = "2d_waypoint";
-        RefreshMarkers();
+        RefreshMarkerDecoration();
     }
 
     public void On3DSphereClicked()
     {
         markerType = "3d_sphere";
-        RefreshMarkers();
+        RefreshMarkerDecoration();
     }
 
     public void On3DCubeClicked()
     {
         markerType = "3d_cube";
-        RefreshMarkers();
+        RefreshMarkerDecoration();
     }
 
     public void On3DArrowClicked()
     {
         markerType = "3d_arrow";
-        RefreshMarkers();
+        RefreshMarkerDecoration();
     }
     public void OnToggleDistanceIndicator()
     {
         displayDistanceIndicator = !displayDistanceIndicator;
-        RefreshMarkers();
+        RefreshMarkerDecoration();
     }
 
     public void OnToggleScaleWithDistance()
     {
         scaleWithDistance = !scaleWithDistance;
-        RefreshMarkers();
+        RefreshMarkerDecoration();
     }
 }
