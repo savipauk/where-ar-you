@@ -56,7 +56,7 @@ public class PositionServiceClient : MonoBehaviour
             }
             latest.AddRange(userPositions.Values);
 
-            if (waitingForGeolocation || deserialized.Count == 0)
+            if (deserialized.Count == 0)
             {
                 yield break;
             }
@@ -80,9 +80,6 @@ public class PositionServiceClient : MonoBehaviour
             StartCoroutine(FetchPositions());
             fetchTimer = PositionServerFetchInterval;
         }
-
-        // DEBUG ONLY
-        waitingForGeolocation = false;
 
         // Get the origin (user position) only initially - rely on device tracking afterwards
         if (waitingForGeolocation && Input.location.status == LocationServiceStatus.Running)
