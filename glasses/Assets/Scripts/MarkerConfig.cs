@@ -1,18 +1,26 @@
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Timeline;
 
 public class MarkerConfig : MonoBehaviour
 {
     public GameObject markerPrefab;
+    public GameObject gpsCoordsDisplay;
+    public GameObject markerPoolController;
 
     private string markerType = "2d_waypoint";
     private bool displayDistanceIndicator = false;
     private bool scaleWithDistance = false;
+    private bool useGPSAltitude = true;
 
     void Start()
     {
         On2DWaypointClicked(); // Start with 2D Waypoint selected
+    }
+    void Update()
+    {
+        gpsCoordsDisplay.GetComponent<TMP_Text>().text = $"Lat {Input.location.lastData.latitude:F6}, Lon {Input.location.lastData.longitude:F6}, Alt {Input.location.lastData.altitude:F2}m";
     }
 
     public void RefreshMarkerDecoration()
@@ -69,5 +77,11 @@ public class MarkerConfig : MonoBehaviour
     {
         scaleWithDistance = !scaleWithDistance;
         RefreshMarkerDecoration();
+    }
+
+    public void OnToggleUseGPSAltitude()
+    {
+        useGPSAltitude = !useGPSAltitude;
+        markerPoolController.GetComponent<MarkerPoolController>().SetUseGPSAltitude(useGPSAltitude);
     }
 }

@@ -25,7 +25,7 @@ public class PositionServiceClient : MonoBehaviour
     public float DesiredLocalAccuracyInMeters = 1f;
     public float UpdateLocalDistanceInMeters = 1f;
 
-    private GeoPosition origin = new GeoPosition { latitude = 45.80944313945194, longitude = 15.999005239514487, altitude = 0.5 };
+    private GeoPosition origin = new GeoPosition { latitude = 45.80944313945194, longitude = 15.999005239514487, altitude = 0 };
     private float fetchTimer = 0f;
 
     private bool waitingForGeolocation = true;

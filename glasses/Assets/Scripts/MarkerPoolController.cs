@@ -8,6 +8,8 @@ public class MarkerPoolController : MonoBehaviour
     public GameObject markerPrefab;
     public GameObject markerConfig;
 
+    private bool useGPSAltitude = true;
+
     public void ClearMarkers()
     {
         var markers = GameObject.FindGameObjectsWithTag("Marker");
@@ -15,6 +17,11 @@ public class MarkerPoolController : MonoBehaviour
         {
             Destroy(marker);
         }
+    }
+
+    public void SetUseGPSAltitude(bool useGPSAltitude)
+    {
+        this.useGPSAltitude = useGPSAltitude;
     }
 
     Vector3 GetUnityPosFromGeoPosition(GeoPosition geoPos, GeoPosition origin)
@@ -31,7 +38,7 @@ public class MarkerPoolController : MonoBehaviour
 
         return new Vector3(
             (float)(dx * M_PER_DEG_LONGITUDE),
-            (float)(dy),
+            useGPSAltitude? (float)(dy) : 0,
             (float)(dz * M_PER_DEG_LATITUDE)
         );
     }
