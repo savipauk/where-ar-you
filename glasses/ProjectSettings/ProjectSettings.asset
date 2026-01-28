@@ -13,7 +13,7 @@ PlayerSettings:
   useOnDemandResources: 0
   accelerometerFrequency: 60
   companyName: FER
-  productName: ARShapes
+  productName: ARShapes3D
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
   m_SplashScreenBackgroundColor: {r: 0.13725491, g: 0.12156863, b: 0.1254902, a: 1}
@@ -139,8 +139,11 @@ PlayerSettings:
   loadStoreDebugModeEnabled: 0
   visionOSBundleVersion: 1.0
   tvOSBundleVersion: 1.0
-  bundleVersion: 0.1
-  preloadedAssets: []
+  bundleVersion: 1.0
+  preloadedAssets:
+  - {fileID: 11400000, guid: fbd0d0525307a4de286b5b9da52d4e07, type: 2}
+  - {fileID: 11400000, guid: 7ff3cc84cfbc14b428241653eda48e36, type: 2}
+  - {fileID: -815397340268178631, guid: 3c48157b70d3a46e8a108a6c8141f177, type: 2}
   metroInputSource: 0
   wsaTransparentSwapchain: 0
   m_HolographicPauseOnTrackingLoss: 1
@@ -161,7 +164,7 @@ PlayerSettings:
   androidSupportedAspectRatio: 1
   androidMaxAspectRatio: 2.1
   applicationIdentifier:
-    Android: com.FER.ARShapes
+    Android: com.FER.ARShapes3D
     Standalone: com.DefaultCompany.XREALSDKTemplate
   buildNumber:
     Standalone: 0
